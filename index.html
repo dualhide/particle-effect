@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Warp Particle Effect</title>
+    <title>Warp Particle Effect with Text and Scroll Speed Up</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <style>
         body {
@@ -12,13 +12,29 @@
         }
         canvas {
             display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+        .catchphrase {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: Arial, sans-serif;
+            font-size: 36px;
+            text-align: center;
+            color: #000;
+            z-index: 1;
         }
     </style>
 </head>
 <body>
+    <div class="catchphrase">Make your idea into reality</div>
     <script>
         const particles = [];
-        const speedMultiplier = 2;
+        let speedMultiplier = 2;
 
         function setup() {
             createCanvas(window.innerWidth, window.innerHeight);
@@ -61,6 +77,10 @@
                 point(this.x, this.y);
             }
         }
+
+        document.addEventListener('scroll', function () {
+            speedMultiplier = 4;
+        });
     </script>
 </body>
 </html>
