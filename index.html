@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Particle Effect</title>
+    <title>Warp Particle Effect</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <style>
         body {
@@ -18,6 +18,7 @@
 <body>
     <script>
         const particles = [];
+        const speedMultiplier = 2;
 
         function setup() {
             createCanvas(window.innerWidth, window.innerHeight);
@@ -27,7 +28,8 @@
         }
 
         function draw() {
-            background(255);
+            background(0);
+            translate(width / 2, height / 2);
             for (let i = 0; i < particles.length; i++) {
                 particles[i].update();
                 particles[i].show();
@@ -36,26 +38,25 @@
 
         class Particle {
             constructor() {
-                this.x = random(width);
-                this.y = random(height);
-                this.vx = random(-1, 1);
-                this.vy = random(-1, 1);
+                this.angle = random(TWO_PI);
+                this.radius = random(width / 4);
+                this.x = this.radius * cos(this.angle);
+                this.y = this.radius * sin(this.angle);
             }
 
             update() {
-                this.x += this.vx;
-                this.y += this.vy;
+                this.angle += 0.01;
+                this.radius += speedMultiplier;
+                this.x = this.radius * cos(this.angle);
+                this.y = this.radius * sin(this.angle);
 
-                if (this.x < 0 || this.x > width) {
-                    this.vx = -this.vx;
-                }
-                if (this.y < 0 || this.y > height) {
-                    this.vy = -this.vy;
+                if (this.radius > width / 2) {
+                    this.radius = random(width / 4);
                 }
             }
 
             show() {
-                stroke(0);
+                stroke(255);
                 strokeWeight(4);
                 point(this.x, this.y);
             }
