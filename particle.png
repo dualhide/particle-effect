@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Particle Effect</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        const particles = [];
+
+        function setup() {
+            createCanvas(window.innerWidth, window.innerHeight);
+            for (let i = 0; i < 100; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function draw() {
+            background(255);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].show();
+            }
+        }
+
+        class Particle {
+            constructor() {
+                this.x = random(width);
+                this.y = random(height);
+                this.vx = random(-1, 1);
+                this.vy = random(-1, 1);
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                if (this.x < 0 || this.x > width) {
+                    this.vx = -this.vx;
+                }
+                if (this.y < 0 || this.y > height) {
+                    this.vy = -this.vy;
+                }
+            }
+
+            show() {
+                stroke(0);
+                strokeWeight(4);
+                point(this.x, this.y);
+            }
+        }
+    </script>
+</body>
+</html>
