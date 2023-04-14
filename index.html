@@ -22,30 +22,32 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-family: Arial, sans-serif;
-            font-size: 36px;
+            font-family: Lato, sans-serif;
+            font-weight: bold;
+            font-size: 48px;
             text-align: center;
-            color: #000;
+            color: #FFF;
             z-index: 1;
+            white-space: nowrap;
         }
     </style>
 </head>
 <body>
     <div class="catchphrase">Make your idea into reality</div>
     <script>
+
         const particles = [];
-        let speedMultiplier = 2;
 
         function setup() {
-            createCanvas(window.innerWidth, window.innerHeight);
+            createCanvas(window.innerWidth, window.innerHeight, WEBGL);
             for (let i = 0; i < 100; i++) {
-                particles.push(new Particle());
+                particles[i] = new Particle();
             }
         }
 
         function draw() {
-            background(0);
-            translate(width / 2, height / 2);
+            background(255, 255, 255, 0);
+
             for (let i = 0; i < particles.length; i++) {
                 particles[i].update();
                 particles[i].show();
@@ -58,29 +60,60 @@
                 this.radius = random(width / 4);
                 this.x = this.radius * cos(this.angle);
                 this.y = this.radius * sin(this.angle);
+                this.color = this.randomColor();
+                this.alpha = 255;
+                this.warpSpeed = false;
+                this.size = random(2, 4);
+            }
+
+            randomColor() {
+                const colors = [
+                    color(255, 255, 255),
+                    color(255, 255, 255),
+                    color(255, 255, 255),
+                    color(255, 255, 200),
+                    color(255, 200, 200),
+                ];
+                return random(colors);
             }
 
             update() {
                 this.angle += 0.01;
-                this.radius += speedMultiplier;
+                this.radius += 4;
+
+                if (this.radius > width / 2) {
+                    this.warpSpeed = true;
+                    this.radius += 10;
+                    this.alpha -= 5;
+                }
+
                 this.x = this.radius * cos(this.angle);
                 this.y = this.radius * sin(this.angle);
 
-                if (this.radius > width / 2) {
-                    this.radius = random(width / 4);
+                if (this.alpha <= 0) {
+                    this.reset();
                 }
             }
 
-            show() {
-                stroke(255);
-                strokeWeight(4);
-                point(this.x, this.y);
+            reset() {
+                this.angle = random(TWO_PI);
+                this.radius = random(width / 4);
+                this.x = this.radius * cos(this.angle);
+                this.y = this.radius * sin(this.angle);
+                this.color = this.randomColor();
+                this.alpha = 255;
+                this.warpSpeed= false;
+                this.size = random(2, 4);
             }
-        }
 
-        document.addEventListener('scroll', function () {
-            speedMultiplier = 4;
-        });
-    </script>
+            show() {
+                const size = map(this.radius, 0, width / 2, 2, 8);
+
+　　　　　　　　　　stroke(this.color.levels[0], this.color.levels[1], this.color.levels[2], this.alpha);
+            strokeWeight(size);
+            point(this.x, this.y);
+        }
+    }
+</script>
 </body>
 </html>
