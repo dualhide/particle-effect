@@ -4,11 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Warp Particle Effect with Text and Scroll Speed Up</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito&display=swap">
+    <script src="https://kit.fontawesome.com/e7756b1ea4.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <style>
         body {
             margin: 0;
-            overflow: hidden;
+            background-color: black;
+            font-family: 'Nunito', sans-serif;
         }
         canvas {
             display: block;
@@ -18,7 +21,7 @@
             z-index: -1;
         }
         .catchphrase {
-            position: absolute;
+            position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
@@ -27,93 +30,392 @@
             font-size: 48px;
             text-align: center;
             color: #FFF;
-            z-index: 1;
+            z-index: 2;
             white-space: nowrap;
+        }
+        .supplement {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, 120%);
+            font-family: Lato, sans-serif;
+            font-weight: normal;
+            font-size: 24px;
+            text-align: center;
+            color: #FFF;
+            z-index: 2;
+            white-space: nowrap;
+            opacity: 0;
+        }
+        .catchphrase, .supplement {
+            transition: font-size 1s ease-in-out, opacity 1s ease-in-out; /* ゆっくりとしたアニメーションに変更 */
+        }
+
+        .card-container {
+            z-index: 3;
+            position: relative;
+            top: 200vh;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 16px;
+            padding: 100px 0;
+            background-color: rgba(11, 19, 35, 0.8);
+            width: 100%; /* 画面の横幅いっぱいに広げる */
+
+        }
+
+        .card {
+            background-color: rgba(28, 35, 51, 1);
+            padding: 20px;
+            border-radius: 8px;
+            width: calc(100vw / 2);
+            height: calc(100vw / 9);
+            box-shadow: 0 4px 6px rgba(33, 40, 57, 0.1);
+            color: #fff;
+
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .list-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+
+            padding-right: 80px;
+        }
+
+        /* 追加: h3, p, ul のマージン設定 */
+        .list-container h3,
+        .list-container p,
+        .list-container ul {
+            margin-bottom: 2px; /* 任意の値に変更してください */
+        }
+
+        .icon-container {
+            font-size: 48px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 1;
+            
+            position: absolute;
+            right: 80px;
+            top: 80px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background-color: rgba(193, 40, 114, 1);
+            z-index: 3;
+            color: #fff;
+            text-decoration: none;
+            font-size: 24px;
+            padding: 6px 24px;
+            border-radius: 0;
+            width: calc(100vw / 2);
+            height: calc(100vw / 18);
+            line-height: calc(100vw / 18);
+            text-align: center;
+            margin-top: 16px;
+            box-sizing: border-box;
+            /* ボタン押下時のスタイルを追加 */
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+            transition-duration: 0.2s;
+        }
+
+        /* ボタンがアクティブ（押されている）時のスタイルを追加 */
+        .cta-button:active {
+            background-color: rgba(193, 40, 114, 0.9);
+            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
+            transform: translateY(2px);
+        }
+
+        .hidden {
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        /* タブレット向けのスタイル */
+        @media only screen and (max-width: 768px) {
+            .catchphrase {
+                font-size: 36px;
+            }
+            .supplement {
+                font-size: 18px;
+            }
+            .card {
+                width: calc(100vw - 40px);
+                height: auto;
+            }
+            .cta-button {
+                width: calc(100vw - 40px);
+                height: calc(100vw / 12);
+                line-height: calc(100vw / 12);
+            }
+        }
+
+        /* モバイル向けのスタイル */
+        @media only screen and (max-width: 480px) {
+            .catchphrase {
+                font-size: 28px;
+            }
+            .supplement {
+                font-size: 14px;
+            }
+            .card {
+                width: calc(100vw - 40px);
+                height: auto;
+            }
+            .cta-button {
+                width: calc(100vw - 40px);
+                height: calc(100vw / 9);
+                line-height: calc(100vw / 9);
+            }
+        }
+
+        .chrome-optimized {
+            position: fixed;
+            right: 10px;
+            bottom: 10px;
+            font-size: 14px;
+            color: #333;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 5px 10px;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
     <div class="catchphrase">Make your idea into reality</div>
+    <div class="supplement">with intelligent integration & hyper-automations.</div>
+    <div style="height: 2000px;"></div>
+    <div class="card-container">
+        <div class="card">
+            <div class="list-container">
+                <h3> <i class="fa-solid fa-cloud fa-lg" style="color: #ffffff;"></i> Cloud Native</h3>
+                <ul>
+                    <li>AWS, GCP, Azure, Oracle における豊富な経験</li>
+                    <li>Serverless, コンテナでのマイクロサービスの実現</li>
+                    <li>高度なクラウドインフラストラクチャのスキル</li>
+                <ul>
+            </div>
+            <div class="icon-container">
+                <i class="fa-brands fa-aws fa-xl"></i>
+            </div>
+        </div>
+        <div class="card">
+            <div class="list-container">
+                <h3>IT Modernization</h3>
+                <p>スクラム、DevOps、CI/CD Pipeline</p>
+                <ul>
+                    <li>スクラムによる短期間でのリリース、継続的な改善</li>
+                    <li>GitLab, GitHub, CircleCI を用いた DevOps</li>
+                    <li>Infra as Code によるインフラ領域の自動化</li>
+                <ul>
+            </div>
+            <div class="icon-container">
+                <i class="fa-brands fa-gitlab fa-xl"></i>
+            </div>
+        </div>
+        <div class="card">
+            <div class="list-container">
+                <h3>Digital Transformation</h3>
+                <ul>
+                    <li>OpenAI, ChatGPT</li>
+                    <li>AutoML, VertexAI, DataIku</li>
+                    <li>UiPath, ServcieNow, GAS</li>
+                    <li>API Integration, Data mining, UI Automation, Computer vision</li>
+                <ul>
+            </div>
+            <div class="icon-container">
+                <i class="fa-solid fa-robot fa-xl"></i>
+            </div>
+        </div>
+        <a href="https://www.yatatech.com/about" class="cta-button" target="_blank">Check More</a>
+    </div>
+    <div class="chrome-optimized" style="display: none;">
+        このページは Chrome に最適化されています
+    </div>
     <script>
-
-        const particles = [];
-
-        function setup() {
-            createCanvas(window.innerWidth, window.innerHeight, WEBGL);
-            for (let i = 0; i < 100; i++) {
-                particles[i] = new Particle();
-            }
+        function isChromeBased() {
+            const userAgent = navigator.userAgent.toLowerCase();
+            return userAgent.includes("chrome") || userAgent.includes("brave");
         }
 
-        function draw() {
-            background(255, 255, 255, 0);
+        if (isChromeBased()) {
+            const particles = [];
+            let scrollSpeed = 1;
+            let supplementVisible = false;
+            let catchphraseEmphasized = false;
+            let catchphraseFaded = false;
 
-            for (let i = 0; i < particles.length; i++) {
-                particles[i].update();
-                particles[i].show();
-            }
-        }
-
-        class Particle {
-            constructor() {
-                this.angle = random(TWO_PI);
-                this.radius = random(width / 4);
-                this.x = this.radius * cos(this.angle);
-                this.y = this.radius * sin(this.angle);
-                this.color = this.randomColor();
-                this.alpha = 255;
-                this.warpSpeed = false;
-                this.size = random(2, 4);
-            }
-
-            randomColor() {
-                const colors = [
-                    color(255, 255, 255),
-                    color(255, 255, 255),
-                    color(255, 255, 255),
-                    color(255, 255, 200),
-                    color(255, 200, 200),
-                ];
-                return random(colors);
-            }
-
-            update() {
-                this.angle += 0.01;
-                this.radius += 4;
-
-                if (this.radius > width / 2) {
-                    this.warpSpeed = true;
-                    this.radius += 10;
-                    this.alpha -= 5;
-                }
-
-                this.x = this.radius * cos(this.angle);
-                this.y = this.radius * sin(this.angle);
-
-                if (this.alpha <= 0) {
-                    this.reset();
+            function setup() {
+                createCanvas(window.innerWidth, window.innerHeight, WEBGL);
+                for (let i = 0; i < 100; i++) {
+                    particles[i] = new Particle();
                 }
             }
-
-            reset() {
-                this.angle = random(TWO_PI);
-                this.radius = random(width / 4);
-                this.x = this.radius * cos(this.angle);
-                this.y = this.radius * sin(this.angle);
-                this.color = this.randomColor();
-                this.alpha = 255;
-                this.warpSpeed= false;
-                this.size = random(2, 4);
+        
+            function draw() {
+                background(255, 255, 255, 0);
+        
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].show();
+                }
             }
+        
+            function scrollingFunction() {
+                const scrollY = window.scrollY || window.pageYOffset;
+                const windowHeight = window.innerHeight;
+                const documentHeight = document.body.offsetHeight;
+                const scrollRatio = scrollY / (documentHeight - windowHeight);
+                scrollSpeed = 1 + 4 * scrollRatio;
+            }
+        
+            window.addEventListener('scroll', () => {
+                scrollingFunction();
 
-            show() {
-                const size = map(this.radius, 0, width / 2, 2, 8);
+                const windowHeight = window.innerHeight;
 
-　　　　　　　　　　stroke(this.color.levels[0], this.color.levels[1], this.color.levels[2], this.alpha);
-            strokeWeight(size);
-            point(this.x, this.y);
+                const catchphrase = document.querySelector('.catchphrase');
+                const supplement = document.querySelector('.supplement');
+                const documentHeight = document.documentElement.scrollHeight || document.body.scrollHeight; // 修正: documentHeightを定義
+                const scrollRatio = scrollY / (documentHeight - windowHeight);
+                const scrollThreshold = windowHeight / 2; // スクロール閾値を画面の半分に変更
+                const fadeThreshold = 0.8; // フェードアウト閾値を変更
+
+                if (window.scrollY > scrollThreshold && !supplementVisible) {
+                    supplementVisible = true;
+                    supplement.style.opacity = 1;
+                } else if (window.scrollY <= scrollThreshold && supplementVisible) {
+                    supplementVisible = false;
+                    supplement.style.opacity = 0;
+                }
+
+                if (!catchphraseEmphasized && window.scrollY > scrollThreshold / 2) {
+                    catchphraseEmphasized = true;
+                    catchphrase.style.fontSize = '60px';
+                } else if (catchphraseEmphasized && window.scrollY <= scrollThreshold / 2) {
+                    catchphraseEmphasized = false;
+                    catchphrase.style.fontSize = '48px';
+                }
+
+                if (!catchphraseFaded && scrollRatio > fadeThreshold) {
+                    catchphraseFaded = true;
+                    catchphrase.style.transition = 'opacity 0s, font-size 0s'; // 一瞬で消えるように変更
+                    catchphrase.style.opacity = 0;
+                    supplement.style.transition = 'opacity 0s'; // 一瞬で消えるように変更
+                    supplement.style.opacity = 0;
+                } else if (catchphraseFaded && scrollRatio <= fadeThreshold) {
+                    catchphraseFaded = false;
+                    catchphrase.style.transition = 'opacity 1s ease-in-out, font-size 1s ease-in-out'; // 元のアニメーションに戻す
+                    catchphrase.style.opacity = 1;
+                    supplement.style.transition = 'opacity 1s ease-in-out'; // 元のアニメーションに戻す
+                    supplement.style.opacity = supplementVisible ? 1 : 0; // 修正: supplementVisible に応じて opacity を設定
+                }
+
+                const cardContainer = document.querySelector('.card-container');
+                const containerRect = cardContainer.getBoundingClientRect();
+                const containerTop = containerRect.top;
+
+                // card-container が画面を覆ったときにパーティクルのアニメーションが停止するようにする
+                if (containerTop <= 0) {
+                    noLoop();
+                } else {
+                    loop();
+                }
+            });
+        
+            class Particle {
+                constructor() {
+                    this.angle = random(TWO_PI);
+                    this.radius = random(width / 4);
+                    this.x = this.radius * cos(this.angle);
+                    this.y = this.radius * sin(this.angle);
+                    this.color = this.randomColor();
+                    this.alpha = 255;
+                    this.warpSpeed = false;
+                    this.size = random(2, 4);
+                }
+        
+                randomColor() {
+                    const colors = [
+                        color(255, 255, 255),
+                        color(255, 255, 255),
+                        color(255, 255, 255),
+                        color(255, 255, 200),
+                        color(255, 200, 200),
+                    ];
+                    return random(colors);
+                }
+        
+                update() {
+                    this.angle += 0.01;
+                    this.radius += 4 * scrollSpeed;
+        
+                    if (this.radius > width / 2) {
+                        this.warpSpeed = true;
+                        this.radius += 10 * scrollSpeed;
+                        this.alpha -= 5 * scrollSpeed;
+                    }
+        
+                    this.x = this.radius * cos(this.angle);
+                    this.y = this.radius * sin(this.angle);
+        
+                    if (this.alpha <= 0) {
+                        this.reset();
+                    }
+                }
+        
+                reset() {
+                    this.angle = random(TWO_PI);
+                    this.radius = random(width / 4);
+                    this.x = this.radius * cos(this.angle);
+                    this.y = this.radius * sin(this.angle);
+                    this.color = this.randomColor();
+                    this.alpha = 255;
+                    this.warpSpeed= false;
+                    this.size = random(2, 4);
+                }
+                
+                show() {
+                    const size = map(this.radius, 0, width / 2, 2, 8);
+
+                    stroke(this.color.levels[0], this.color.levels[1], this.color.levels[2], this.alpha);
+                    strokeWeight(size);
+                    point(this.x, this.y);
+                }
+            }
+        } else {
+            // Chrome系以外のブラウザの場合
+            document.addEventListener('DOMContentLoaded', () => {
+                const catchphrase = document.querySelector('.catchphrase');
+                const supplement = document.querySelector('.supplement');
+
+                // catchphraseとsupplementを非表示にする
+                //catchphrase.style.display = 'none';
+                supplement.style.opacity = 1;
+
+                // card-containerを固定表示にする
+                const cardContainer = document.querySelector('.card-container');
+                //cardContainer.style.position = 'fixed';
+                cardContainer.style.top = '0';
+                cardContainer.style.left = '0';
+                cardContainer.style.right = '0';
+                cardContainer.style.bottom = '0';
+                cardContainer.style.overflowY = 'scroll';
+
+                const chromeOptimized = document.querySelector(".chrome-optimized");
+                if (chromeOptimized) {
+                    chromeOptimized.style.display = "block";
+                }
+
+            });
         }
-    }
-</script>
+    </script>
 </body>
 </html>
