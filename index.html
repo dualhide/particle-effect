@@ -242,7 +242,7 @@
     <script>
         function isChromeBased() {
             const userAgent = navigator.userAgent.toLowerCase();
-            return userAgent.includes("chrome") || userAgent.includes("brave");
+            return userAgent.includes("chrome") || userAgent.includes("brave") || userAgent.includes("edge");
         }
 
         if (isChromeBased()) {
